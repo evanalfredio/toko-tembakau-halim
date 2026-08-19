@@ -1,26 +1,334 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  Design tokens — Toko Tembakau Halim
+  Style: premium tobacco, modern heritage, dark luxury, masculine, elegant.
+  Palette: black (ink), cream, tobacco brown, subtle gold.
+  This file is the single source of truth for the design system (V1 foundation).
+  Page composition / final layout is intentionally NOT decided here.
+*/
+
+@theme {
+  /* ---- Color: ink (dark tobacco-brown base, not neutral black) ---- */
+  --color-ink-950: #170f09;
+  --color-ink-900: #201509;
+  --color-ink-800: #2b1c0f;
+  --color-ink-700: #3a2716;
+  --color-ink-600: #4d3620;
+
+  /* ---- Color: cream (warm off-white) ---- */
+  --color-cream-50: #fbf7ee;
+  --color-cream-100: #f6efdf;
+  --color-cream-200: #ece0c6;
+  --color-cream-300: #ddcca4;
+
+  /* ---- Color: tobacco (brown) ---- */
+  --color-tobacco-300: #c08a5c;
+  --color-tobacco-400: #a9744a;
+  --color-tobacco-500: #8b5a34;
+  --color-tobacco-600: #6b4226;
+  --color-tobacco-700: #4f2f1b;
+  --color-tobacco-800: #3a2314;
+
+  /* ---- Color: gold (subtle accent) ---- */
+  --color-gold-300: #e8d3a0;
+  --color-gold-400: #d4af6a;
+  --color-gold-500: #b8935a;
+  --color-gold-600: #9c7a45;
+
+  /* ---- Semantic color roles ----
+     V1 is dark-luxury by default (no light/dark toggle yet).
+     Components should reference these, not raw palette values. */
+  --color-background: var(--color-ink-950);
+  --color-surface: var(--color-ink-900);
+  --color-surface-raised: var(--color-ink-800);
+  --color-border: var(--color-ink-700);
+  --color-border-strong: var(--color-tobacco-700);
+
+  --color-foreground: var(--color-cream-100);
+  --color-foreground-muted: var(--color-cream-300);
+  --color-foreground-subtle: color-mix(in srgb, var(--color-cream-100) 55%, transparent);
+
+  --color-accent: var(--color-gold-400);
+  --color-accent-strong: var(--color-gold-500);
+  --color-accent-foreground: var(--color-ink-950);
+
+  --color-brand: var(--color-tobacco-500);
+  --color-brand-strong: var(--color-tobacco-600);
+
+  /* ---- Typography ----
+     Display: serif, for headings — heritage / editorial feel.
+     Sans: body copy, long-form readability. */
+  --font-display: var(--font-playfair), ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --tracking-eyebrow: 0.22em;
+
+  /* ---- Radius ----
+     Kept small and architectural (not rounded-pill) to read masculine / premium. */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.875rem;
+
+  /* ---- Shadows ----
+     Warm, low-key shadows for a dark canvas; a distinct gold glow for accents. */
+  --shadow-card: 0 1px 0 0 rgba(246, 239, 223, 0.04) inset, 0 12px 32px -16px rgba(0, 0, 0, 0.7);
+  --shadow-elevated: 0 1px 0 0 rgba(246, 239, 223, 0.05) inset, 0 24px 60px -20px rgba(0, 0, 0, 0.8);
+  --shadow-gold: 0 0 0 1px rgba(212, 175, 106, 0.35), 0 8px 24px -8px rgba(212, 175, 106, 0.35);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes fade-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-slide-down {
+  animation: fade-slide-down 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ---- View Transitions (native browser API) — product grid <-> product detail ---- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ---- ProductCard interactivity ----
+   Base rules define the transition-ready state (always present, incl. touch).
+   Actual hover changes are gated to real hover-capable pointers so tapping on
+   touch devices never "sticks" a hover state. */
+.product-card {
+  transition:
+    transform 450ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 450ms ease,
+    border-color 450ms ease,
+    opacity 450ms ease;
+}
+
+.product-card-image {
+  transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.product-card-surface {
+  transition: background-color 450ms ease;
+}
+
+.product-card-reveal {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 350ms ease,
+    transform 350ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .product-grid:has(.product-card:hover) .product-card:not(:hover) {
+    opacity: 0.55;
+  }
+
+  .product-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .product-card:hover .product-card-image {
+    transform: scale(1.08);
+  }
+
+  .product-card:hover .product-card-surface {
+    background-color: var(--color-surface-raised);
+  }
+
+  .product-card:hover .product-card-reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =====================================================================
+   CUSTOM CURSOR — desktop only (pointer: fine)
+   All elements are fixed-position, pointer-events: none, will-change: transform.
+   Native cursor is hidden on body and restored on inputs/textareas.
+   ===================================================================== */
+
+/* Hide native cursor on body when custom cursor is active.
+   Restored on form elements so users always see a native text/pointer cue. */
+.custom-cursor-active,
+.custom-cursor-active a,
+.custom-cursor-active button,
+.custom-cursor-active [role="button"],
+.custom-cursor-active label {
+  cursor: none !important;
+}
+
+/* Always restore native cursor on inputs — accessibility requirement */
+.custom-cursor-active input,
+.custom-cursor-active textarea,
+.custom-cursor-active select {
+  cursor: auto !important;
+}
+
+/* ---- Dot (instant follow) ----------------------------------------- */
+.custom-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+  transform: translate3d(-200px, -200px, 0) translate(-50%, -50%);
+  /* State transitions */
+  transition:
+    width 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 220ms ease,
+    opacity 220ms ease;
+}
+
+.custom-cursor-dot--button {
+  width: 10px;
+  height: 10px;
+  background: var(--color-gold-300);
+}
+
+.custom-cursor-dot--view {
+  width: 4px;
+  height: 4px;
+  opacity: 0.5;
+}
+
+.custom-cursor-dot--link {
+  width: 8px;
+  height: 8px;
+  background: var(--color-gold-400);
+}
+
+/* ---- Ring (lerp-follow) -------------------------------------------- */
+.custom-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(212, 175, 106, 0.5);
+  pointer-events: none;
+  z-index: 9998;
+  will-change: transform;
+  transform: translate3d(-200px, -200px, 0) translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* State transitions */
+  transition:
+    width 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 300ms ease,
+    border-width 300ms ease,
+    background 300ms ease;
+}
+
+.custom-cursor-ring--button {
+  width: 56px;
+  height: 56px;
+  border-color: rgba(212, 175, 106, 0.7);
+  border-width: 1px;
+  background: rgba(212, 175, 106, 0.06);
+}
+
+.custom-cursor-ring--view {
+  width: 76px;
+  height: 76px;
+  border-color: rgba(212, 175, 106, 0.85);
+  border-width: 1px;
+  background: rgba(10, 9, 6, 0.55);
+}
+
+.custom-cursor-ring--link {
+  width: 48px;
+  height: 48px;
+  border-color: rgba(212, 175, 106, 0.45);
+}
+
+/* ---- VIEW label inside ring ---------------------------------------- */
+.custom-cursor-label {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-cream-100);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  user-select: none;
+  transition: opacity 200ms ease;
+}
+
+/* ---- Accessibility: reduce motion ---------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .custom-cursor-dot,
+  .custom-cursor-ring {
+    transition: none !important;
+  }
+}
+
+/* ---- Touch / coarse pointer: never show custom cursor -------------- */
+@media (pointer: coarse) {
+  .custom-cursor-dot,
+  .custom-cursor-ring {
+    display: none !important;
+  }
+
+  .custom-cursor-active,
+  .custom-cursor-active a,
+  .custom-cursor-active button,
+  .custom-cursor-active [role="button"],
+  .custom-cursor-active label,
+  .custom-cursor-active input,
+  .custom-cursor-active textarea,
+  .custom-cursor-active select {
+    cursor: auto !important;
+  }
 }
