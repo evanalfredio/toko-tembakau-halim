@@ -38,9 +38,17 @@ export function Footer() {
         </div>
 
         <div className="flex flex-col items-start justify-between gap-6 border-t border-border pt-8 sm:flex-row sm:items-center">
-          <p className="text-xs text-foreground-subtle">
-            &copy; {new Date().getFullYear()} {siteConfig.name}. Seluruh hak cipta dilindungi.
-          </p>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+            <p className="text-xs text-foreground-subtle">
+              &copy; {new Date().getFullYear()} {siteConfig.name}. Seluruh hak cipta dilindungi.
+            </p>
+            <Link
+              href="/privacy-policy"
+              className="text-xs text-foreground-subtle underline-offset-4 transition-colors hover:text-accent hover:underline"
+            >
+              Kebijakan Privasi
+            </Link>
+          </div>
           <div className="flex items-center gap-4">
             <a
               href={getEmailLink(siteConfig.contact.email)}
