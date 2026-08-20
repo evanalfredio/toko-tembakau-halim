@@ -17,7 +17,7 @@ export const siteConfig: SiteConfig = {
   contact: {
     address: "Jl. Patimura No.1, Mojorejo, Kec. Junrejo, Kota Batu, Jawa Timur 65321",
     whatsapp: "085646402753",
-    email: "[EMAIL]",
+    email: "admin@tokotembakauhalim.com",
     hours: "09.00 - 16.00",
     mapUrl: "https://maps.app.goo.gl/N9vy4HYALiaELr6q7",
     mapEmbedUrl: "https://maps.google.com/maps?q=-7.9013787,112.5588973&z=16&output=embed",
